@@ -1,0 +1,34 @@
+
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+
+  "sqltools.connections": [
+    {
+        "name": "Lesson30",
+        "driver": "InterSystems IRIS",
+        "server": "127.0.0.1",
+        "port": 52773,
+        "https": false,
+        "namespace": "DEMO",
+        "username": "_SYSTEM",
+        "password": "ISCDEMO",
+        "previewLimit": 50,
+        "showSystem": false
+    },
+    {
+        "namespace": "DEMO",
+        "connectionMethod": "Server and Port",
+        "showSystem": false,
+        "previewLimit": 50,
+        "server": "127.0.0.1",
+        "port": 8080,
+        "https": false,
+        "askForPassword": false,
+        "driver": "InterSystems IRIS",
+        "name": "irisdemo",
+        "username": "_system",
+        "password": "ISCDEMO"
+    }
+]
+}
+

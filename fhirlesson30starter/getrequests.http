@@ -1,0 +1,91 @@
+###
+GET http://127.0.0.1:8888/LP
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+GET  http://127.0.0.1:8888/Patient
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+GET  http://127.0.0.1:8888/Patient/LP0002
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+###
+GET  http://127.0.0.1:8888/Patient?family=Nguyen
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+GET  http://127.0.0.1:8888/Patient?phone=617-555-0101
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+
+###
+
+###
+GET  http://127.0.0.1:8888/metadata
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+###
+
+
+###
+GET  http://127.0.0.1:8888/Observation/1
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+###
+###
+GET  http://127.0.0.1:8888/Observation?patient=LP0002
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+###
+###
+GET  http://127.0.0.1:8888/Observation?code=2345-7
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+###
+###
+GET  http://127.0.0.1:8888/Observation?code=http://loinc.org|2345-7
+Authorization: Basic _System:ISCDEMO
+Accept: */*
+content-type: application/fhir+json
+Accept-Encoding: gzip, deflate, br
+Prefer: return=representation
+###

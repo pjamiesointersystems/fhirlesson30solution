@@ -1,4 +1,4 @@
-# facadestarter.py
+# facadeproblem1.py
 """
 FHIR Facade (starter):
 - Everything from v3 (OperationOutcome for unsupported params, logging)
@@ -17,7 +17,7 @@ Run:
 
 from fastapi import FastAPI, HTTPException, Query, Request, Response
 from fastapi.responses import JSONResponse
-from fastapi.encoders import jsonable_encoder 
+from fastapi.encoders import jsonable_encoder  # <-- added
 from typing import Any, Optional
 from datetime import date, datetime
 from contextlib import asynccontextmanager
@@ -60,7 +60,7 @@ TABLE_NAME = "Demo.DemoPatients"
 # ---- caching disabled in starter ----
 
 # Supported Patient search parameters for this demo facade
-SUPPORTED_PATIENT_PARAMS = {"identifier", "family", "given", "_count", "offset"}
+SUPPORTED_PATIENT_PARAMS = {"identifier", "family", "given", "phone", "_count", "offset"}  # <-- added phone
 
 
 app = FastAPI(
@@ -163,6 +163,7 @@ def build_search_sql(
     identifier: Optional[str],
     family: Optional[str],
     given: Optional[str],
+    phone: Optional[str],  # <-- added
 ) -> tuple[str, list[Any]]:
     base = f"""
         SELECT LegacyPatientID, MRN, FirstName, LastName, DateOfBirth, Sex,
@@ -184,6 +185,11 @@ def build_search_sql(
     if given:
         where.append("UPPER(FirstName) LIKE ?")
         params.append(f"%{given.upper()}%")
+
+    if phone:
+        # Simple contains match; tolerant of formatted or partial input
+        where.append("LOWER(Phone) LIKE ?")
+        params.append(f"%{phone}%")
 
     if where:
         base += " WHERE " + " AND ".join(where)
@@ -299,7 +305,7 @@ def list_legacy_patients(limit: Optional[int] = None, offset: Optional[int] = No
     summary="Search Patients (FHIR)",
     description=(
         "Returns a Bundle(searchset) of FHIR Patient resources. "
-        "Supported params: identifier (MRN or system|value), family (contains), given (contains), _count, offset. "
+        "Supported params: identifier (MRN or system|value), family (contains), given (contains), phone (contains), _count, offset. "
         "Unsupported params return OperationOutcome(not-supported)."
     ),
     tags=["FHIR / Patient"]
@@ -309,6 +315,7 @@ def search_patient(
     identifier: Optional[str] = Query(None, description="MRN exact match (system|value also accepted)"),
     family: Optional[str] = Query(None, description="Family/LastName contains"),
     given: Optional[str] = Query(None, description="Given/FirstName contains"),
+    phone: Optional[str] = Query(None, description="Phone contains (digits or formatted)"),  # <-- added
     _count: Optional[int] = Query(10, ge=1, le=100, description="Page size"),
     offset: Optional[int] = Query(0, ge=0, description="Offset for paging"),
 ):
@@ -319,7 +326,7 @@ def search_patient(
 
     params = dict(request.query_params)
   
-    sql, sql_params = build_search_sql(identifier, family, given)
+    sql, sql_params = build_search_sql(identifier, family, given, phone)  # <-- pass phone
     sql += " LIMIT ? OFFSET ?"
     sql_params.extend([_count, offset])
 
@@ -339,6 +346,7 @@ def search_patient(
         if identifier: query_parts.append(f"identifier={identifier}")
         if family: query_parts.append(f"family={family}")
         if given: query_parts.append(f"given={given}")
+        if phone: query_parts.append(f"phone={phone}")  # <-- add to self link
         query_parts.append(f"_count={_count}")
         query_parts.append(f"offset={offset}")
         self_url = base_url + ("?" + "&".join(query_parts) if query_parts else "")
@@ -444,7 +452,7 @@ def capability_statement():
     Minimal, accurate CapabilityStatement for this facade (FHIR R4).
     - fhirVersion: 4.0.1
     - format: json
-    - REST: Patient resource supports read + search-type with identifier/family/given
+    - REST: Patient resource supports read + search-type with identifier/family/given/phone
     - Unsupported params documented in rest.documentation
     """
     from datetime import datetime
@@ -471,7 +479,7 @@ def capability_statement():
             "mode": "server",
             "documentation": (
                 "Teaching facade. Only a subset of Patient search parameters is supported: "
-                "identifier (MRN or system|value), family (contains), given (contains). "
+                "identifier (MRN or system|value), family (contains), given (contains), phone (contains). "
                 "Unsupported parameters return OperationOutcome(not-supported)."
             ),
             "resource": [{
@@ -487,6 +495,8 @@ def capability_statement():
                      "documentation": "LastName contains (case-insensitive)."},
                     {"name": "given", "type": "string",
                      "documentation": "FirstName contains (case-insensitive)."},
+                    {"name": "phone", "type": "string",
+                     "documentation": "Phone contains (legacy Phone column)."},  # <-- added
                 ],
                 "documentation": "Mapped from Demo.DemoPatients to minimal FHIR Patient."
             }],
@@ -509,7 +519,7 @@ def capability_statement():
 
 if __name__ == "__main__":
     uvicorn.run(
-        "facadestarter:app",
+        "facadeproblem1:app",
         host="127.0.0.1",
         port=8888,
         reload=False,
