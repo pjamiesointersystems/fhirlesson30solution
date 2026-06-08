@@ -99,4 +99,4 @@ Russ Leftwich, M.D. – Senior Clinical Advisor, Interoperability
 📌 License
 
 This project is for educational use within the FHIR Application Development Course.
-See the repository for license details.
+See the repository for license details
